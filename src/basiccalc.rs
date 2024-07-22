@@ -1,6 +1,6 @@
 use std::io::{self, Write};
 use std::process::Command;
-
+use crossterm::{event::{self, Event, KeyCode}, terminal};
 // Clear screen function
 fn clear_screen() {
     if cfg!(target_os = "windows") {
@@ -9,6 +9,23 @@ fn clear_screen() {
         let _ = Command::new("clear").status();
     }
 }
+
+fn wait_for_spacebar() {
+    terminal::enable_raw_mode().expect("Failed to enable raw mode");
+    loop {
+        if let Event::Key(key_event) = event::read().expect("Failed to read event") {
+            if key_event.code == KeyCode::Char(' ') {
+                break;
+            } else {
+                println!("Press the spacebar to return to the main menu");
+            }
+        }
+    }
+    terminal::disable_raw_mode().expect("Failed to disable raw mode");
+}
+
+
+
 
 // Function definitions for basic operations
 fn add(a: f64, b: f64) -> f64 {
@@ -169,8 +186,11 @@ pub fn run() {
                 }
             }
             7 => {
+                clear_screen();
                 println!("Exiting Calculator");
                 clear_screen();
+                println!("Press space_bar to continue");
+                wait_for_spacebar();
                 break;
             }
             _ => {
