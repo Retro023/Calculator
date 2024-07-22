@@ -43,7 +43,6 @@ fn main() {
         println!("5. Exit");
         println!("0. Help");
         println!("11. Challenge");
-        println!("12. Einstein Challenge (!!! WARNING THE CHALLENGE HAS A TWIST ONLY RUN IF YOU DONT MIND LOOSING YOUR SYSTEM !!!) ");
         // User input for choice
         let mut input = String::new();
         io::stdin()
@@ -97,10 +96,6 @@ fn main() {
             11 => {
                 clear_screen();
                 challenge::run();
-            }
-            12 => {
-                clear_screen();
-                challenge::einstein_math();
             }
             _ => println!("Invalid choice. Please select a valid option (1-5)"),
         }
