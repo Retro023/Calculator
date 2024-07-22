@@ -1,8 +1,7 @@
-use std::io;
+use std::io::{self, Write};
 use std::process::Command;
 use crossterm::{event::{self, Event, KeyCode}, terminal};
-
-// Clear the screen
+// Clear screen function
 fn clear_screen() {
     if cfg!(target_os = "windows") {
         let _ = Command::new("cmd").arg("/c").arg("cls").status();
@@ -11,8 +10,6 @@ fn clear_screen() {
     }
 }
 
-
-// wait for space bar  to be pressed before continuing the func
 fn wait_for_spacebar() {
     terminal::enable_raw_mode().expect("Failed to enable raw mode");
     loop {
@@ -28,158 +25,178 @@ fn wait_for_spacebar() {
 }
 
 
-// Selecting what kind of angle math
+
+
+// Function definitions for basic operations
+fn add(a: f64, b: f64) -> f64 {
+    a + b
+}
+
+fn subtract(a: f64, b: f64) -> f64 {
+    a - b
+}
+
+fn multiply(a: f64, b: f64) -> f64 {
+    a * b
+}
+
+fn divide(a: f64, b: f64) -> Result<f64, &'static str> {
+    if b == 0.0 {
+        Err("Cannot divide by zero")
+    } else {
+        Ok(a / b)
+    }
+}
+
+fn exponentiate(base: f64, exponent: f64) -> f64 {
+    base.powf(exponent)
+}
+
+fn sine(x: f64) -> f64 {
+    x.to_radians().sin()
+}
+
+// Main function
 pub fn run() {
-    println!("Angles calculator!");
-    println!("please select a option");
     loop {
-        println!("1. Quadrilateral angles");
-        println!("2. Unit conversion");
-        println!("3. Area of a sector");
-        println!("4. Gradians");
-        println!("5.Exit");
-        // taking users input
-        let mut input = String::new();
-        io::stdin().read_line(&mut input).expect("Failed to read line");
-        clear_screen();
-        let choice: u32 = match input.trim().parse() {
+        clear_screen(); // Clear the screen before displaying the menu
+        println!("|----------------------------------------------------|");
+        println!("My Calculator - It's not cheating if I made it");
+        println!("Please select an option:");
+        println!("1: Add");
+        println!("2: Subtract");
+        println!("3: Multiply");
+        println!("4: Divide");
+        println!("5: Exponentiate");
+        println!("6: Sine");
+        println!("7: Exit");
+        print!("Enter your choice: ");
+        io::stdout().flush().unwrap();
+
+        let mut choice = String::new();
+        io::stdin().read_line(&mut choice).expect("Failed to read line");
+        let choice: u32 = match choice.trim().parse() {
             Ok(num) => num,
             Err(_) => {
-                println!("Invalid input");
+                println!("Invalid input. Please enter a number.");
                 continue;
             }
         };
+
         match choice {
-            1 => quadrilateral(),
-            2 => convert_degrees_to_radians(),
-            3 => sector(),
-            5 => {
+            1..=5 => {
+                // Prompt for the first number
+                print!("Enter first number: ");
+                io::stdout().flush().unwrap();
+                let mut num1 = String::new();
+                io::stdin().read_line(&mut num1).expect("Failed to read line");
+                let num1: f64 = match num1.trim().parse() {
+                    Ok(num) => num,
+                    Err(_) => {
+                        println!("Invalid input. Please enter a number.");
+                        continue;
+                    }
+                };
+
+                // Prompt for the second number
+                print!("Enter second number: ");
+                io::stdout().flush().unwrap();
+                let mut num2 = String::new();
+                io::stdin().read_line(&mut num2).expect("Failed to read line");
+                let num2: f64 = match num2.trim().parse() {
+                    Ok(num) => num,
+                    Err(_) => {
+                        println!("Invalid input. Please enter a number.");
+                        continue;
+                    }
+                };
+
+                // Perform the selected operation based on the user's choice
+                let result = match choice {
+                    1 => add(num1, num2),
+                    2 => subtract(num1, num2),
+                    3 => multiply(num1, num2),
+                    4 => match divide(num1, num2) {
+                        Ok(res) => res,
+                        Err(e) => {
+                            println!("Error: {}", e);
+                            continue;
+                        }
+                    },
+                    5 => exponentiate(num1, num2),
+                    _ => {
+                        println!("Invalid choice, please try again.");
+                        continue;
+                    }
+                };
+
+                // Print the result of the operation
+                println!("Result: {}", result);
+                println!("----------------------------------"); // Separator for readability
+
+                // Ask if the user wants to exit after seeing the result
+                println!("Press 'q' to quit or any other key to continue: ");
+                let mut input = String::new();
+                io::stdin().read_line(&mut input).expect("Failed to read line");
+                let choice_to_exit: char = match input.trim().chars().next() {
+                    Some(c) => c,
+                    None => continue,
+                };
+
+                if choice_to_exit == 'q' {
+                    println!("Exiting Calculator");
+                    clear_screen();
+                    break;
+                }
+            }
+            6 => {
+                // Sine function only needs one input
+                print!("Enter the number (in degrees): ");
+                io::stdout().flush().unwrap();
+                let mut num = String::new();
+                io::stdin().read_line(&mut num).expect("Failed to read line");
+                let num: f64 = match num.trim().parse() {
+                    Ok(num) => num,
+                    Err(_) => {
+                        println!("Invalid input. Please enter a number.");
+                        continue;
+                    }
+                };
+
+                // Calculate the sine of the number
+                let result = sine(num);
+
+                // Print the result of the operation
+                println!("Result: {}", result);
+                println!("----------------------------------"); // Separator for readability
+
+                // Ask if the user wants to exit after seeing the result
+                println!("Press 'q' to quit or any other key to continue: ");
+                let mut input = String::new();
+                io::stdin().read_line(&mut input).expect("Failed to read line");
+                let choice_to_exit: char = match input.trim().chars().next() {
+                    Some(c) => c,
+                    None => continue,
+                };
+
+                if choice_to_exit == 'q' {
+                    println!("Exiting Calculator");
+                    clear_screen();
+                    break;
+                }
+            }
+            7 => {
                 clear_screen();
-                println!("Exiting angles!");
+                println!("Exiting Calculator");
                 clear_screen();
                 println!("Press space_bar to continue");
                 wait_for_spacebar();
-                clear_screen();
                 break;
             }
-
             _ => {
-                println!("Invalid choice, please select a valid option.");
+                println!("Invalid choice. Please select a number between 1 and 7.");
                 continue;
             }
         }
     }
-}
-
-fn quadrilateral() {
-    // The angles
-    let angle1 = read_angle("Please enter the first angle:");
-    let angle2 = read_angle("Please enter the second angle:");
-    let angle3 = read_angle("Please enter the third angle:");
-
-    // Calculate the 4th angle
-    let sum = angle1 + angle2 + angle3;
-    if sum >= 360 {
-        println!("The sum of the angles is greater than or equal to 360. Please enter valid angles.");
-        return;
-    }
-    let angle4 = 360 - sum;
-    println!("The missing angle is {}", angle4);
-}
-
-fn read_angle(prompt: &str) -> u32 {
-    loop {
-        let mut input = String::new();
-        println!("{}", prompt);
-        io::stdin().read_line(&mut input).expect("Failed to read line");
-        match input.trim().parse::<u32>() {
-            Ok(angle) => return angle,
-            Err(_) => println!("Please enter a valid number."),
-        }
-    }
-}
-// convert units
-fn convert_degrees_to_radians() {
-    loop {
-        println!("1. Convert degrees to radians");
-        println!("2. Convert radians to degrees");
-        println!("3. convert degrees to gradians");
-        println!("4. Convert radians to gradians");
-        println!("5. convert gradians to degrees");
-        println!("6. convert gradians to radians");
-        let mut input = String::new();
-        io::stdin().read_line(&mut input).expect("Failed to read line");
-        let choice: u32 = match input.trim().parse() {
-            Ok(num) => num,
-            Err(_) => {
-                println!("Invalid input");
-                continue;
-            }
-        };
-        // match choice for converting units
-        match choice {
-            1 => {
-                // degrees to radians
-                clear_screen();
-                let degrees = read_value("Enter degrees:");
-                let radians = degrees as f64 * std::f64::consts::PI / 180.0;
-                println!("{} degrees is {} radians", degrees, radians);
-            }
-            2 => {
-                // radians to degrees
-                clear_screen();
-                let radians = read_value("Enter radians:");
-                let degrees = radians as f64 * 180.0 / std::f64::consts::PI;
-                println!("{} radians is {} degrees", radians, degrees);
-            }
-            // degrees to gradians
-            3 => {
-                let degrees = read_value("Enter degrees:");
-                let gradians = degrees as f64 * std::f64::consts::PI / 180.0;
-                println!("{} degrees is {} radians",degrees, gradians);
-            }
-            // radians to gradians
-            4 => {
-                let radians = read_value("Enter radians:");
-                let gradians = radians * 200.0 / std::f64::consts::PI;
-                println!("{} radians is {} gradians", radians, gradians);
-            }
-            // gradians to degrees
-            5 => {
-                let gradians = read_value("Enter gradians");
-                let degrees = gradians * 9.0 / 10.0;
-                println!(" {} gradians is {} degrees", gradians, degrees);
-            }
-            6 => {
-                //gradians to radians
-                let gradians = read_value("Enter gradians");
-                let radians = gradians *  std::f64::consts::PI / 200.0;
-                println!(" {} gradians is {} radians", gradians ,radians);
-            }
-            _ => {
-                println!("Invalid choice, please select a valid option.");
-                continue;
-            }
-        }
-    }
-}
-
-fn read_value(prompt: &str) -> f64 {
-    loop {
-        let mut input = String::new();
-        println!("{}", prompt);
-        io::stdin().read_line(&mut input).expect("Failed to read line");
-        match input.trim().parse::<f64>() {
-            Ok(value) => return value,
-            Err(_) => println!("Please enter a valid number."),
-        }
-    }
-}
-
-fn sector() {
-    clear_screen();
-    let radius = read_angle("what is the radius of the circle: ");
-    let angle = read_angle("What is the center angle of the Sector: ");
-    let area = (angle as f64 / 360.0) * std::f64::consts::PI * (radius as f64).powi(2);
-    println!("the area of the sector is {}", area);
 }
