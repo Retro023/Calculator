@@ -4,6 +4,8 @@
 use std::io;
 use std::process::Command;
 
+use crate::wait_for_spacebar;
+
 fn clear_screen(){
     if cfg!(target_os = "windows"){
         let _ = Command::new("cmd").arg("/c").arg("cls").status();
@@ -54,7 +56,11 @@ pub fn run() {
             9 => handle_parallelogram(),
             10 => handle_ellipse(),
             11 => {
-                println!("Thank you for using the Geometric Shapes Calculator. Goodbye!");
+                clear_screen();
+                println!("Exiting geometric calculator");
+                clear_screen();
+                println!("Press space bar to continue");
+                wait_for_spacebar();
                 break;
             }
             _ => println!("Invalid choice. Please select a number between 1 and 11."),
