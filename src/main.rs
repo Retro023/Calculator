@@ -1,4 +1,3 @@
-// libarys
 use std::io;
 use std::process::Command;
 use crossterm::{event::{self, Event, KeyCode}, terminal};
@@ -8,7 +7,7 @@ mod basiccalc;
 mod geometry;
 mod angles;
 mod trigonometry;
-
+mod challenge;
 
 fn clear_screen() {
     if cfg!(target_os = "windows") {
@@ -18,18 +17,18 @@ fn clear_screen() {
     }
 }
 
-fn wait_for_spacebar(){
-    terminal::enable_raw_mode().expect("failed to enable raw mode");
+fn wait_for_spacebar() {
+    terminal::enable_raw_mode().expect("Failed to enable raw mode");
     loop {
-        if let Event::Key(key_event) = event::read().expect("Failed to read event"){
-            if key_event.code == KeyCode::Char(' '){
+        if let Event::Key(key_event) = event::read().expect("Failed to read event") {
+            if key_event.code == KeyCode::Char(' ') {
                 break;
-            }else {
-                println!("Press the spacebar to return to the main menu")
+            } else {
+                println!("Press the spacebar to return to the main menu");
             }
         }
     }
-terminal::disable_raw_mode().expect("failed to disable raw mode");
+    terminal::disable_raw_mode().expect("Failed to disable raw mode");
 }
 
 fn main() {
@@ -37,12 +36,14 @@ fn main() {
     loop {
         println!("A rust based calculator!");
         println!("Select an option");
-        println!("1.  Basic calculations");
-        println!("2.  Geometric calculations");
-        println!("3.  Geometric angles");
-        println!("4.  Trigonometry");
-        println!("5.  Exit");
-        println!("0.  help");
+        println!("1. Basic calculations");
+        println!("2. Geometric calculations");
+        println!("3. Geometric angles");
+        println!("4. Trigonometry");
+        println!("5. Exit");
+        println!("0. Help");
+        println!("11. Challenge");
+        println!("12. Einstein Challenge (!!! WARNING THE CHALLENGE HAS A TWIST ONLY RUN IF YOU DONT MIND LOOSING YOUR SYSTEM !!!) ");
         // User input for choice
         let mut input = String::new();
         io::stdin()
@@ -60,23 +61,20 @@ fn main() {
         match choice {
             1 => {
                 clear_screen();
-                basiccalc::run();      
+                basiccalc::run();
             }
             2 => {
-                clear_screen(); 
-                geometry::run();       
+                clear_screen();
+                geometry::run();
             }
             3 => {
                 clear_screen();
                 angles::run();
             }
-            
             4 => {
                 clear_screen();
                 trigonometry::run();
             }
-            
-            
             5 => {
                 println!("Thank you for using the rust calculator.");
                 break;
@@ -84,17 +82,27 @@ fn main() {
             0 => {
                 clear_screen();
                 println!("HELP:");
-                println!("This Calculator is written in Rust and it is here to help you in your maths work with features like");
-                println!("- basic arithmetic");
+                println!("This Calculator is written in Rust and it is here to help you in your math work with features like:");
+                println!("- Basic arithmetic");
                 println!("- Geometry");
-                println!("To use the Calculator just simply select the option you wish to use by typing the number and hitting enter");
-                println!("To exit the program type 4");
-                println!("\npress the spacebar to return to the main menu");
+                println!("- Angles");
+                println!("- Trigonometry");
+                println!("To use the Calculator, simply select the option you wish to use by typing the number and hitting enter.");
+                println!("To exit the program, type 5.");
+                println!("\nPress the spacebar to return to the main menu");
                 wait_for_spacebar();
                 clear_screen();
                 continue;
             }
-            _ => println!("Invalid choice. Please select a valid option (1-3)"),
+            11 => {
+                clear_screen();
+                challenge::run();
+            }
+            12 => {
+                clear_screen();
+                challenge::einstein_math();
+            }
+            _ => println!("Invalid choice. Please select a valid option (1-5)"),
         }
     }
 }
