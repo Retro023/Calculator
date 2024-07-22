@@ -1,5 +1,6 @@
 use std::io;
 use std::process::Command;
+use crossterm::{event::{self, Event, KeyCode}, terminal};
 
 // Clear the screen
 fn clear_screen() {
@@ -10,6 +11,23 @@ fn clear_screen() {
     }
 }
 
+
+// wait for space bar  to be pressed before continuing the func
+fn wait_for_spacebar() {
+    terminal::enable_raw_mode().expect("Failed to enable raw mode");
+    loop {
+        if let Event::Key(key_event) = event::read().expect("Failed to read event") {
+            if key_event.code == KeyCode::Char(' ') {
+                break;
+            } else {
+                println!("Press the spacebar to return to the main menu");
+            }
+        }
+    }
+    terminal::disable_raw_mode().expect("Failed to disable raw mode");
+}
+
+
 // Selecting what kind of angle math
 pub fn run() {
     println!("Angles calculator!");
@@ -19,7 +37,7 @@ pub fn run() {
         println!("2. Unit conversion");
         println!("3. Area of a sector");
         println!("4. Gradians");
-        
+        println!("5.Exit");
         // taking users input
         let mut input = String::new();
         io::stdin().read_line(&mut input).expect("Failed to read line");
@@ -35,6 +53,16 @@ pub fn run() {
             1 => quadrilateral(),
             2 => convert_degrees_to_radians(),
             3 => sector(),
+            5 => {
+                clear_screen();
+                println!("Exiting angles!");
+                clear_screen();
+                println!("Press space_bar to continue");
+                wait_for_spacebar();
+                clear_screen();
+                break;
+            }
+
             _ => {
                 println!("Invalid choice, please select a valid option.");
                 continue;
