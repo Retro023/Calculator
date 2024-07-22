@@ -1,6 +1,6 @@
 use std::io;
 use std::process::Command;
-
+use crossterm::{event::{self, Event, KeyCode}, terminal};
 use num_complex::Complex;
 
 // Clear the screen
@@ -11,6 +11,23 @@ fn clear_screen() {
         let _ = Command::new("clear").status();
     }
 }
+
+fn wait_for_spacebar() {
+    terminal::enable_raw_mode().expect("Failed to enable raw mode");
+    loop {
+        if let Event::Key(key_event) = event::read().expect("Failed to read event") {
+            if key_event.code == KeyCode::Char(' ') {
+                break;
+            } else {
+                println!("Press the spacebar to return to the main menu");
+            }
+        }
+    }
+    terminal::disable_raw_mode().expect("Failed to disable raw mode");
+}
+
+
+
 
 // Func to read a floating-point value from user input
 fn read_value(prompt: &str) -> f64 {
@@ -147,7 +164,11 @@ pub fn run() {
 
             
             8 => {
+                clear_screen();
                 println!("Exiting Trigonometry Calculator");
+                clear_screen();
+                println!("Press space_bar to continue");
+                wait_for_spacebar();
                 break;
             }
             _ => {
